@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>DRAW Setup</title>
+<title>DRAW User Guide for Optimal Performance</title>
 <style>
   :root {
     --bg: #f5f7fb;
@@ -248,8 +248,7 @@
 <body>
 
 <header>
-  <h1>DRAW Setup</h1>
-  <p>A guide to configuring new boolean structures using auto-segmentation structures and Tata Medical Center DRAW templates.</p>
+  <h1>DRAW User Guide for Optimal Performance</h1>
 </header>
 
 <main class="cards">
@@ -267,11 +266,11 @@
     <span class="count">3 entries</span>
   </div>
 
-  <div class="card disabled" data-section="define-ruleset" hidden>
+  <div class="card" data-section="define-ruleset">
     <div class="icon">R</div>
     <h2>Define rule set</h2>
-    <p>Define custom rule sets for structure evaluation.</p>
-    <span class="count">Coming soon</span>
+    <p>Rule group definitions for structure evaluation across treatment sites.</p>
+    <span class="count">3 entries</span>
   </div>
 </main>
 
@@ -320,6 +319,14 @@
         { label: "Step 2: ROI name, Select Type and Add Operation", img: "add ROI/Pipeline Builder - New Structure.jpg" },
         { label: "Step 3: Check info and Save Structure", img: "add ROI/Pipeline Builder - New Structure (1).jpg" }
       ]
+    },
+    "define-ruleset": {
+      title: "Define rule set",
+      items: [
+        { label: "Breast DIBH", img: "Rules/Breast DIBH Rulegroup - Rule Group Details.jpg" },
+        { label: "Lung and Esophagus", img: "Rules/Lung and Esophagus Rule Group - Rule Group Details.jpg" },
+        { label: "Brain MRI", img: "Rules/Brain MRI T2 Flair - Rule Group Details.jpg" }
+      ]
     }
   };
 
@@ -333,10 +340,6 @@
   document.querySelectorAll(".card").forEach(card => {
     card.addEventListener("click", () => {
       const section = card.dataset.section;
-      if (section === "define-ruleset") {
-        openComingSoon();
-        return;
-      }
       openSection(section);
     });
   });
