@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DRAW Setup</title>
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-soft: #dbeafe;
+    --border: #e5e7eb;
+    --shadow: 0 10px 25px rgba(0,0,0,0.08);
+    --shadow-hover: 0 16px 40px rgba(0,0,0,0.12);
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    text-align: center;
+    padding: 15vh 20px 24px;
+  }
+
+  header h1 {
+    margin: 0 0 8px;
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+
+  .cards {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--accent);
+  }
+
+  .card .icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .card h2 {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+
+  .card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: .95rem;
+    line-height: 1.5;
+  }
+
+  .card .count {
+    margin-top: auto;
+    font-size: .8rem;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+
+  .card.disabled {
+    cursor: not-allowed;
+    opacity: .7;
+  }
+  .card.disabled:hover {
+    transform: none;
+    border-color: var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: none;
+    align-items: stretch;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--card);
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    margin: 0;
+    border-radius: 0;
+    display: flex;
+    overflow: hidden;
+    box-shadow: none;
+  }
+
+  .toc {
+    width: 300px;
+    min-width: 260px;
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    overflow-y: auto;
+    background: #fafbfd;
+  }
+
+  .toc h3 {
+    margin: 0 0 16px;
+    font-size: 1.1rem;
+    padding: 10vh 8px 8px;
+  }
+
+  .toc-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    font-size: .92rem;
+    color: var(--text);
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .toc-item:hover { background: var(--accent-soft); }
+  .toc-item.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  .viewer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .viewer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .viewer-header .title {
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+
+  .close-btn {
+    border: none;
+    background: #f3f4f6;
+    color: var(--text);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background .15s ease;
+  }
+  .close-btn:hover { background: #e5e7eb; }
+
+  .viewer-body {
+    flex: 1;
+    overflow: auto;
+    padding: 24px;
+    background: #f9fafb;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .viewer-body img {
+    width: 120%;
+    height: auto;
+    max-width: none;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  }
+
+  .coming-soon {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .coming-soon .big {
+    font-size: 3rem;
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 720px) {
+    .modal { flex-direction: column; margin: 12px; }
+    .toc { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DRAW Setup</h1>
+  <p>A guide to configuring new boolean structures using auto-segmentation structures and Tata Medical Center DRAW templates.</p>
+</header>
+
+<main class="cards">
+  <div class="card" data-section="templates">
+    <div class="icon">T</div>
+    <h2>Templates</h2>
+    <p>Browse the Tata Medical Center DRAW templates available for auto-segmentation across treatment sites.</p>
+    <span class="count">9 entries</span>
+  </div>
+
+  <div class="card" data-section="boolean-roi">
+    <div class="icon">B</div>
+    <h2>Boolean ROI</h2>
+    <p>Step-by-step guide to creating a new boolean structure using the Pipeline Builder.</p>
+    <span class="count">3 entries</span>
+  </div>
+
+  <div class="card disabled" data-section="define-ruleset" hidden>
+    <div class="icon">R</div>
+    <h2>Define rule set</h2>
+    <p>Define custom rule sets for structure evaluation.</p>
+    <span class="count">Coming soon</span>
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <aside class="toc">
+      <h3 id="toc-title">Contents</h3>
+      <div id="toc-list"></div>
+    </aside>
+    <section class="viewer">
+      <div class="viewer-header">
+        <span class="title" id="viewer-title">Select an item</span>
+        <button class="close-btn" id="close-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="viewer-body" id="viewer-body">
+        <div class="coming-soon">
+          <div class="big">&#128218;</div>
+          <p>Pick an entry from the table of contents to view its image.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  const sections = {
+    "templates": {
+      title: "Templates",
+      items: [
+        { label: "Example Breast Template", img: "templates/Example Breast Template - Template Details.jpg" },
+        { label: "Example Breast DIBH Template", img: "templates/Breast DIBH Template - Template Details.jpg" },
+        { label: "Example Head Neck Template", img: "templates/Example Head Neck Template - Template Details.jpg" },
+        { label: "Example Gyn Template", img: "templates/Example Gyn Template - Template Details.jpg" },
+        { label: "Example Brain Template", img: "templates/Example CNS Template - Template Details.jpg" },
+        { label: "Example Brain MRI Template", img: "templates/Brain MRI Template - Template Details.jpg" },
+        { label: "Example Lung Template", img: "templates/Example Lung Template - Template Details.jpg" },
+        { label: "Example Prostate Template", img: "templates/Example Prostate Template - Template Details.jpg" },
+        { label: "Example Rectum Template", img: "templates/Example Rectum Template - Template Details.jpg" }
+      ]
+    },
+    "boolean-roi": {
+      title: "Boolean ROI",
+      items: [
+        { label: "Step 1: Add Structure", img: "add ROI/Testing for adding boolean ROI - Template Details.jpg" },
+        { label: "Step 2: ROI name, Select Type and Add Operation", img: "add ROI/Pipeline Builder - New Structure.jpg" },
+        { label: "Step 3: Check info and Save Structure", img: "add ROI/Pipeline Builder - New Structure (1).jpg" }
+      ]
+    }
+  };
+
+  const modal = document.getElementById("modal");
+  const tocList = document.getElementById("toc-list");
+  const tocTitle = document.getElementById("toc-title");
+  const viewerTitle = document.getElementById("viewer-title");
+  const viewerBody = document.getElementById("viewer-body");
+  const closeBtn = document.getElementById("close-btn");
+
+  document.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => {
+      const section = card.dataset.section;
+      if (section === "define-ruleset") {
+        openComingSoon();
+        return;
+      }
+      openSection(section);
+    });
+  });
+
+  function openSection(key) {
+    const data = sections[key];
+    if (!data) return;
+    tocTitle.textContent = data.title;
+    tocList.innerHTML = "";
+    viewerTitle.textContent = "Select an item";
+    viewerBody.innerHTML = '<div class="coming-soon"><div class="big">&#128218;</div><p>Pick an entry from the table of contents to view its image.</p></div>';
+
+    data.items.forEach((item, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "toc-item";
+      btn.textContent = item.label;
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".toc-item").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        viewerTitle.textContent = item.label;
+        viewerBody.innerHTML = "";
+        const img = document.createElement("img");
+        img.src = item.img;
+        img.alt = item.label;
+        viewerBody.appendChild(img);
+      });
+      tocList.appendChild(btn);
+      if (idx === 0) btn.click();
+    });
+
+    modal.classList.add("active");
+  }
+
+  function openComingSoon() {
+    tocTitle.textContent = "Define rule set";
+    tocList.innerHTML = '<p style="color:var(--muted);padding:8px;font-size:.9rem;">No entries yet.</p>';
+    viewerTitle.textContent = "Define rule set";
+    viewerBody.innerHTML = '<div class="coming-soon"><div class="big">&#128221;</div><p>Documentation for this section is coming soon.</p></div>';
+    modal.classList.add("active");
+  }
+
+  closeBtn.addEventListener("click", () => modal.classList.remove("active"));
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.classList.remove("active");
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") modal.classList.remove("active");
+  });
+</script>
+
+</body>
+</html>
